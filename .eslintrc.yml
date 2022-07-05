@@ -1,5 +1,4 @@
 env:
-  browser: true
   es2021: true
   node: true
 extends:
@@ -7,4 +6,8 @@ extends:
 parserOptions:
   ecmaVersion: latest
   sourceType: module
-rules: {}
+rules: {
+  no-console: off,
+  import/extensions: 0,
+  no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }] 
+}
