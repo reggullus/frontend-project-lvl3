@@ -1,10 +1,6 @@
-import * as yup from 'yup';
 import onChange from 'on-change';
 
-const validate = (url, feeds) => {
-  const schema = yup.string().required().url().notOneOf(feeds);
-  return schema.validate(url, { abortEarly: false });
-};
+const axios = require('axios').default;
 
 const renderErrors = (elements, value) => {
   elements.input.classList.remove('is-invalid');
@@ -14,19 +10,30 @@ const renderErrors = (elements, value) => {
   elements.feedback.textContent = value;
 };
 
-const handleProcessSubmit = (elements, value) => {
+const handleProcessSubmit = (elements, i18n, value) => {
   elements.button.disabled = true;
+
+  axios.get(value)
+    .then((response) => {
+      const parser = new DOMParser();
+      console.log(response)
+      console.log(parser.parseFromString(response.data, 'text/html'));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+
   elements.feedback.classList.replace('text-danger', 'text-success');
-  elements.feedback.textContent = 'RSS успешно загружен';
+  elements.feedback.textContent = i18n.t('success');
   elements.form.reset();
   elements.input.focus();
   elements.button.disabled = false;
 };
 
-const watcher = (elements) => (state) => onChange(state, (path, value) => {
+const watcher = (elements, i18n) => (state) => onChange(state, (path, value) => {
   switch (path) {
     case 'form.feeds':
-      handleProcessSubmit(elements, value);
+      handleProcessSubmit(elements, i18n, value);
       break;
 
     case 'form.errors':
@@ -40,5 +47,4 @@ const watcher = (elements) => (state) => onChange(state, (path, value) => {
 
 export {
   watcher,
-  validate,
 };

@@ -1,4 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import app from './urlForm.js';
+import app from './application.js';
 
 app();
