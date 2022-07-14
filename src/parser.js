@@ -18,7 +18,7 @@ const getFeed = (data) => {
 };
 
 export default (rss) => {
-  const parser = new DOMParser();
+  const parser = new DOMParser(); // eslint-disable-line
   const doc = parser.parseFromString(rss, 'text/xml');
   const feed = getFeed(doc);
   const posts = getPosts(doc);

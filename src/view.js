@@ -1,6 +1,9 @@
+/* global document */
+/* eslint no-undef: "error" */
 import onChange from 'on-change';
 
 const renderFeeds = (elements, i18n, value) => {
+  const el = elements;
   const header = document.createElement('h2');
   header.textContent = i18n.t('feeds');
 
@@ -21,11 +24,12 @@ const renderFeeds = (elements, i18n, value) => {
     feedList.prepend(feed);
   });
 
-  elements.feeds.innerHTML = '';
-  elements.feeds.append(header, feedList);
+  el.feeds.innerHTML = '';
+  el.feeds.append(header, feedList);
 };
 
 const renderPosts = (elements, i18n, value) => {
+  const el = elements;
   const header = document.createElement('h2');
   header.textContent = i18n.t('posts');
 
@@ -57,41 +61,43 @@ const renderPosts = (elements, i18n, value) => {
     watchButton.dataset.target = '#modal';
 
     watchButton.addEventListener('click', () => {
-      elements.title.textContent = item.title;
-      elements.body.textContent = item.description;
-      elements.redirect.href = item.link;
+      el.title.textContent = item.title;
+      el.body.textContent = item.description;
+      el.redirect.href = item.link;
     });
 
     post.append(titleEl, watchButton);
     fragment.append(post);
   });
 
-  elements.posts.innerHTML = '';
+  el.posts.innerHTML = '';
   postsList.append(fragment);
   elements.posts.append(header, postsList);
 };
 
 const renderErrors = (elements, value) => {
-  elements.input.classList.remove('is-invalid');
+  const el = elements;
+  el.input.classList.remove('is-invalid');
   if (value === null) return;
-  elements.input.classList.add('is-invalid');
-  elements.feedback.classList.replace('text-success', 'text-danger');
-  elements.feedback.textContent = value;
+  el.input.classList.add('is-invalid');
+  el.feedback.classList.replace('text-success', 'text-danger');
+  el.feedback.textContent = value;
 };
 
-const handleProcessSubmit = (elements, i18n, value) => {
-  elements.button.disabled = true;
-  elements.feedback.classList.replace('text-danger', 'text-success');
-  elements.feedback.textContent = i18n.t('success');
-  elements.form.reset();
-  elements.input.focus();
-  elements.button.disabled = false;
+const handleProcessSubmit = (elements, i18n) => {
+  const el = elements;
+  el.button.disabled = true;
+  el.feedback.classList.replace('text-danger', 'text-success');
+  el.feedback.textContent = i18n.t('success');
+  el.form.reset();
+  el.input.focus();
+  el.button.disabled = false;
 };
 
 export default (elements, i18n) => (state) => onChange(state, (path, value) => {
   switch (path) {
     case 'form.feeds':
-      handleProcessSubmit(elements, i18n, value);
+      handleProcessSubmit(elements, i18n);
       break;
 
     case 'form.errors':
