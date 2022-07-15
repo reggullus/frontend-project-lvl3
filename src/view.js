@@ -59,10 +59,12 @@ const renderPosts = (elements, i18n, value) => {
     watchButton.dataset.id = id;
     watchButton.dataset.bsToggle = 'modal';
     watchButton.dataset.bsTarget = '#modal';
+
     titleEl.addEventListener('click', () => {
       post.classList.remove('fw-bold');
       post.classList.add('fw-normal');
     });
+
     watchButton.addEventListener('click', () => {
       post.classList.remove('fw-bold');
       post.classList.add('fw-normal');
