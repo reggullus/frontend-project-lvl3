@@ -43,7 +43,7 @@ const renderPosts = (elements, i18n, value) => {
 
     const post = document.createElement('li');
     post.classList.add('list-group-item', 'd-flex');
-    post.classList.add('justify-content-between', 'align-items-start');
+    post.classList.add('justify-content-between', 'align-items-start', 'fw-bold');
 
     const titleEl = document.createElement('a');
     titleEl.textContent = title;
@@ -57,10 +57,15 @@ const renderPosts = (elements, i18n, value) => {
     watchButton.classList.add('btn', 'btn-primary', 'btn-sm');
     watchButton.setAttribute('type', 'button');
     watchButton.dataset.id = id;
-    watchButton.dataset.toggle = 'modal';
-    watchButton.dataset.target = '#modal';
-
+    watchButton.dataset.bsToggle = 'modal';
+    watchButton.dataset.bsTarget = '#modal';
+    titleEl.addEventListener('click', () => {
+      post.classList.remove('fw-bold');
+      post.classList.add('fw-normal');
+    });
     watchButton.addEventListener('click', () => {
+      post.classList.remove('fw-bold');
+      post.classList.add('fw-normal');
       el.title.textContent = item.title;
       el.body.textContent = item.description;
       el.redirect.href = item.link;

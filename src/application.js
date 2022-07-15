@@ -42,7 +42,7 @@ export default () => {
     feedback: document.querySelector('.feedback'),
     feeds: document.querySelector('.feeds'),
     posts: document.querySelector('.posts'),
-    main: document.querySelector('#modal'),
+    modalFade: document.querySelector('#modal'),
     title: document.querySelector('#modal .modal-title'),
     body: document.querySelector('#modal .modal-body'),
     redirect: document.querySelector('#modal a'),
