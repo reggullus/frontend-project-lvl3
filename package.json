@@ -43,9 +43,6 @@
     "form-data": "^4.0.0",
     "i18next": "^21.8.13",
     "lodash": "^4.17.21",
-    "lodash.differencewith": "^4.5.0",
-    "lodash.isequal": "^4.5.0",
-    "lodash.uniqueid": "^4.0.1",
     "on-change": "^4.0.1",
     "yup": "^0.32.11"
   }

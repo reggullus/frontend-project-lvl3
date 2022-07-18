@@ -104,7 +104,7 @@ export default () => {
             const { feed, posts } = parser(response.data.contents);
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
-            posts.forEach((post) => watchedState.posts.unshift({ ...post, id }));
+            posts.forEach((post) => watchedState.posts.push({ ...post, id }));
           })
           .catch((err) => {
             const axiosError = err.message === 'Network Error' ? i18n.t('errors.networkError') : i18n.t('errors.rssError');
