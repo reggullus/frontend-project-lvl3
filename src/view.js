@@ -1,5 +1,6 @@
 /* global document */
 /* eslint no-undef: "error" */
+import { t } from 'i18next';
 import onChange from 'on-change';
 
 const renderFeeds = (elements, i18n, value) => {
@@ -43,11 +44,11 @@ const renderPosts = (elements, i18n, value) => {
 
     const post = document.createElement('li');
     post.classList.add('list-group-item', 'd-flex');
-    post.classList.add('justify-content-between', 'align-items-start', 'fw-bold');
+    post.classList.add('justify-content-between', 'align-items-start');
 
     const titleEl = document.createElement('a');
     titleEl.textContent = title;
-    titleEl.classList.add('font-weight');
+    titleEl.classList.add('fw-bold');
     titleEl.setAttribute('href', link);
     titleEl.setAttribute('target', '_blank');
     titleEl.setAttribute('rel', 'noopener noreferrer');
@@ -61,13 +62,13 @@ const renderPosts = (elements, i18n, value) => {
     watchButton.dataset.bsTarget = '#modal';
 
     titleEl.addEventListener('click', () => {
-      post.classList.remove('fw-bold');
-      post.classList.add('fw-normal');
+      titleEl.classList.remove('fw-bold');
+      titleEl.classList.add('fw-normal');
     });
 
     watchButton.addEventListener('click', () => {
-      post.classList.remove('fw-bold');
-      post.classList.add('fw-normal');
+      titleEl.classList.remove('fw-bold');
+      titleEl.classList.add('fw-normal');
       el.title.textContent = item.title;
       el.body.textContent = item.description;
       el.redirect.href = item.link;
