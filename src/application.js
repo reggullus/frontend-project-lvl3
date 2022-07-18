@@ -1,5 +1,3 @@
-/* global document */
-/* eslint no-undef: "error" */
 import i18next from 'i18next';
 import * as yup from 'yup';
 import _ from 'lodash';

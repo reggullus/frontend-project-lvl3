@@ -1,6 +1,3 @@
-/* global document */
-/* eslint no-undef: "error" */
-import { t } from 'i18next';
 import onChange from 'on-change';
 
 const renderFeeds = (elements, i18n, value) => {
