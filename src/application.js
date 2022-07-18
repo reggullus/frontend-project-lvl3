@@ -50,11 +50,12 @@ export default () => {
 
   const state = {
     form: {
-      feeds: [],
+      status: '',
       rss: {},
       errors: null,
       axiosError: null,
     },
+    links: [],
     feeds: [],
     posts: [],
   };
@@ -65,7 +66,7 @@ export default () => {
     const { feeds } = state;
     const { posts } = state;
     if (feeds.length === 0) {
-      setTimeout(updatePosts, 5000);
+      return setTimeout(updatePosts, 5000);
     }
     feeds.forEach((feed) => {
       const oldPosts = posts.filter((post) => post.id === feed.id);
@@ -82,7 +83,7 @@ export default () => {
           }
         })
         .catch(() => {
-          state.form.error = 'networkError';
+          watchedState.form.error = i18n.t('errors.networkError');
         });
     });
     return setTimeout(updatePosts, 5000);
@@ -90,22 +91,24 @@ export default () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
+    watchedState.form.status = i18n.t('loading');
     const form = new FormData(e.target);
     const url = form.get('url');
-    validate(url, watchedState.form.feeds)
+    validate(url, watchedState.links)
       .then((validUrl) => {
+        updatePosts();
         axios.get(getProxiedUrl(validUrl))
           .then((response) => {
             watchedState.form.errors = null;
-            watchedState.form.feeds.push(validUrl);
+            watchedState.links.push(validUrl);
             const { feed, posts } = parser(response.data.contents);
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
             posts.forEach((post) => watchedState.posts.unshift({ ...post, id }));
-            setTimeout(updatePosts, 5000);
           })
-          .catch(() => {
-            watchedState.form.errors = i18n.t('errors.rssError');
+          .catch((err) => {
+            const axiosError = err.message === 'Network Error' ? i18n.t('errors.networkError') : i18n.t('errors.rssError');
+            watchedState.form.errors = axiosError;
           });
       })
       .catch((err) => {

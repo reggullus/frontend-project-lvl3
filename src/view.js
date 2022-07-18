@@ -84,16 +84,17 @@ const renderPosts = (elements, i18n, value) => {
 
 const renderErrors = (elements, value) => {
   const el = elements;
+  el.feedback.textContent = '';
   el.input.classList.remove('is-invalid');
   if (value === null) return;
   el.input.classList.add('is-invalid');
   el.feedback.classList.replace('text-success', 'text-danger');
   el.feedback.textContent = value;
+  el.button.disabled = false;
 };
 
 const handleProcessSubmit = (elements, i18n) => {
   const el = elements;
-  el.button.disabled = true;
   el.feedback.classList.replace('text-danger', 'text-success');
   el.feedback.textContent = i18n.t('success');
   el.form.reset();
@@ -101,9 +102,21 @@ const handleProcessSubmit = (elements, i18n) => {
   el.button.disabled = false;
 };
 
+const renderStatus = (elements, value) => {
+  const el = elements;
+  el.button.disabled = true;
+  el.feedback.textContent = '';
+  el.feedback.classList.replace('text-danger', 'text-success');
+  el.feedback.textContent = value;
+};
+
 export default (elements, i18n) => (state) => onChange(state, (path, value) => {
   switch (path) {
-    case 'form.feeds':
+    case 'form.status':
+      renderStatus(elements, value);
+      break;
+
+    case 'links':
       handleProcessSubmit(elements, i18n);
       break;
 
