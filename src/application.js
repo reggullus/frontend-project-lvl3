@@ -95,7 +95,6 @@ export default () => {
     const form = new FormData(e.target);
     const url = form.get('url');
     updatePosts();
-    console.log('load', url)
     validate(url, watchedState.links)
       .then((validUrl) => {
         axios.get(getProxiedUrl(validUrl))
