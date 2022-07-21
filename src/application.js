@@ -57,8 +57,7 @@ export default () => {
 
   const state = {
     form: {
-      status: '',
-      rss: {},
+      process: '',
       errors: null,
       axiosError: null,
     },
@@ -92,20 +91,22 @@ export default () => {
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    watchedState.form.status = i18n.t('loading');
+    watchedState.form.process = i18n.t('loading');
     const form = new FormData(e.target);
     const url = form.get('url');
     updatePosts();
+    console.log('load', url)
     validate(url, watchedState.links)
       .then((validUrl) => {
         axios.get(getProxiedUrl(validUrl))
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
             watchedState.links.push(validUrl);
-            watchedState.form.status = i18n.t('success');
+            watchedState.form.process = i18n.t('success');
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
+            watchedState.form.errors = null;
           })
           .catch((err) => {
             const axiosError = err.message === 'Network Error' ? i18n.t('errors.networkError') : i18n.t('errors.rssError');

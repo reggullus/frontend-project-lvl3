@@ -82,9 +82,10 @@ const renderPosts = (elements, i18n, value) => {
 
 const renderErrors = (elements, value) => {
   const el = elements;
-  el.feedback.textContent = '';
+  if (value === null) return;
   el.input.classList.add('is-invalid');
   el.feedback.classList.replace('text-success', 'text-danger');
+  el.feedback.textContent = '';
   el.feedback.textContent = value;
   el.button.disabled = false;
 };
@@ -119,7 +120,7 @@ const renderStatus = (elements, value) => {
 
 export default (elements, i18n) => (state) => onChange(state, (path, value) => {
   switch (path) {
-    case 'form.status':
+    case 'form.process':
       renderStatus(elements, value);
       break;
 
