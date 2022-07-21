@@ -83,18 +83,14 @@ const renderPosts = (elements, i18n, value) => {
 const renderErrors = (elements, value) => {
   const el = elements;
   el.feedback.textContent = '';
-  el.input.classList.remove('is-invalid');
-  if (value === null) return;
   el.input.classList.add('is-invalid');
   el.feedback.classList.replace('text-success', 'text-danger');
   el.feedback.textContent = value;
   el.button.disabled = false;
 };
 
-const handleProcessSubmit = (elements, i18n) => {
+const handleProcessSubmit = (elements) => {
   const el = elements;
-  el.feedback.classList.replace('text-danger', 'text-success');
-  el.feedback.textContent = i18n.t('success');
   el.form.reset();
   el.input.focus();
   el.button.disabled = false;
@@ -102,10 +98,23 @@ const handleProcessSubmit = (elements, i18n) => {
 
 const renderStatus = (elements, value) => {
   const el = elements;
-  el.button.disabled = true;
-  el.feedback.textContent = '';
-  el.feedback.classList.replace('text-danger', 'text-success');
-  el.feedback.textContent = value;
+  switch (value) {
+    case 'Идет загрузка':
+      el.button.disabled = true;
+      el.feedback.textContent = '';
+      el.feedback.classList.replace('text-danger', 'text-success');
+      el.feedback.textContent = value;
+      break;
+    case 'RSS успешно загружен':
+      el.feedback.textContent = '';
+      el.input.classList.remove('is-invalid');
+      el.feedback.classList.replace('text-danger', 'text-success');
+      el.feedback.textContent = value;
+      break;
+
+    default:
+      break;
+  }
 };
 
 export default (elements, i18n) => (state) => onChange(state, (path, value) => {
@@ -115,7 +124,7 @@ export default (elements, i18n) => (state) => onChange(state, (path, value) => {
       break;
 
     case 'links':
-      handleProcessSubmit(elements, i18n);
+      handleProcessSubmit(elements);
       break;
 
     case 'form.errors':

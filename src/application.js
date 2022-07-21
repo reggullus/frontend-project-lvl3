@@ -95,14 +95,14 @@ export default () => {
     watchedState.form.status = i18n.t('loading');
     const form = new FormData(e.target);
     const url = form.get('url');
+    updatePosts();
     validate(url, watchedState.links)
       .then((validUrl) => {
-        updatePosts();
         axios.get(getProxiedUrl(validUrl))
           .then((response) => {
-            watchedState.form.errors = null;
-            watchedState.links.push(validUrl);
             const { feed, posts } = parser(response.data.contents);
+            watchedState.links.push(validUrl);
+            watchedState.form.status = i18n.t('success');
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
