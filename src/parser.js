@@ -20,6 +20,12 @@ const getFeed = (data) => {
 export default (rss) => {
   const parser = new DOMParser(); // eslint-disable-line
   const doc = parser.parseFromString(rss, 'text/xml');
+  const parserError = doc.querySelector('parsererror');
+
+  if (parserError) {
+    throw new Error(parserError.textContent);
+  }
+
   const feed = getFeed(doc);
   const posts = getPosts(doc);
   return { feed, posts };

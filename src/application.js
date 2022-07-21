@@ -1,19 +1,28 @@
 import i18next from 'i18next';
 import * as yup from 'yup';
 import _ from 'lodash';
+import axios from 'axios';
 import watcher from './view.js';
 import resources from './text/resources.js';
 import parser from './parser.js';
 
 const FormData = require('form-data');
-const axios = require('axios').default;
 
 const validate = (url, feeds) => {
   const schema = yup.string().required().url().notOneOf(feeds);
   return schema.validate(url, { abortEarly: false });
 };
-const proxy = 'https://allorigins.hexlet.app/get?disableCache=true&url=';
-const getProxiedUrl = (url) => `${proxy}${url}`;
+
+const getProxiedUrl = (url) => {
+  const proxy = 'https://allorigins.hexlet.app';
+  const params = { disableCache: true, url };
+
+  const proxyUrl = new URL('/get', proxy);
+  const searchParams = new URLSearchParams(params);
+  proxyUrl.search = searchParams;
+
+  return proxyUrl.toString();
+};
 
 export default () => {
   const defaultLanguage = 'ru';
@@ -61,21 +70,15 @@ export default () => {
   const watchedState = watcher(elements, i18n)(state);
 
   const updatePosts = () => {
-    const { feeds } = state;
-    const { posts } = state;
-    if (feeds.length === 0) {
-      return setTimeout(updatePosts, 5000);
-    }
+    const { feeds, posts } = state;
     feeds.forEach((feed) => {
-      const oldPosts = posts.filter((post) => post.id === feed.id);
       const url = getProxiedUrl(feed.link);
       axios.get(url)
         .then((response) => {
           const data = parser(response.data.contents);
-          return data.posts.map((post) => ({ ...post, id: feed.id }));
-        })
-        .then((currentPosts) => _.differenceWith(currentPosts, oldPosts, _.isEqual))
-        .then((newPosts) => {
+          const currentPosts = data.posts.map((post) => ({ ...post, id: feed.id }));
+          const oldPosts = posts.filter((post) => post.id === feed.id);
+          const newPosts = _.differenceWith(currentPosts, oldPosts, _.isEqual);
           if (newPosts.length !== 0) {
             newPosts.forEach((post) => [post, ...watchedState.posts]);
           }
