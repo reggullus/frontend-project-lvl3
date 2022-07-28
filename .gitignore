@@ -1,5 +1,5 @@
 /node_modules/
-./dist
+/Users/sergejlysov/frontend-project-lvl3/dist
 .DS_Store
 coverage/
 .eslintignore
