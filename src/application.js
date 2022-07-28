@@ -68,33 +68,39 @@ export default () => {
 
   const watchedState = watcher(elements, i18n)(state);
 
-  const updatePosts = () => {
+  const updatePosts = (delay) => {
     const { feeds, posts } = state;
     feeds.forEach((feed) => {
       const url = getProxiedUrl(feed.link);
       axios.get(url)
         .then((response) => {
+          console.log(response)
           const data = parser(response.data.contents);
           const currentPosts = data.posts.map((post) => ({ ...post, id: feed.id }));
           const oldPosts = posts.filter((post) => post.id === feed.id);
           const newPosts = _.differenceWith(currentPosts, oldPosts, _.isEqual);
           if (newPosts.length !== 0) {
-            newPosts.forEach((post) => [post, ...watchedState.posts]);
+            newPosts.forEach((post) => watchedState.posts.push(post));
           }
         })
         .catch(() => {
           watchedState.form.error = i18n.t('errors.networkError');
+        })
+        .finally((e) => {
+          console.log(e)
+          setTimeout(updatePosts, delay);
         });
     });
-    return setTimeout(updatePosts, 5000);
   };
+
+  const delay = 5000;
+  updatePosts(delay);
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     watchedState.form.process = i18n.t('loading');
     const form = new FormData(e.target);
     const url = form.get('url');
-    updatePosts();
     validate(url, watchedState.links)
       .then((validUrl) => {
         axios.get(getProxiedUrl(validUrl))
