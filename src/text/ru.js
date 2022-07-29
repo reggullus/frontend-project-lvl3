@@ -5,6 +5,7 @@ export default {
       alreadyExist: 'RSS уже существует',
       rssError: 'Ресурс не содержит валидный RSS',
       networkError: 'Ошибка сети, попробуйте позже',
+      somethingWrong: 'Что-то пошло не так',
     },
     loading: 'Идет загрузка',
     success: 'RSS успешно загружен',

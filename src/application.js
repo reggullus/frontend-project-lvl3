@@ -6,8 +6,6 @@ import watcher from './view.js';
 import resources from './text/resources.js';
 import parser from './parser.js';
 
-const FormData = require('form-data');
-
 const validate = (url, feeds) => {
   const schema = yup.string().required().url().notOneOf(feeds);
   return schema.validate(url, { abortEarly: false });
@@ -57,7 +55,7 @@ export default () => {
 
   const state = {
     form: {
-      process: '',
+      process: null,
       errors: null,
       axiosError: null,
     },
@@ -66,39 +64,44 @@ export default () => {
     posts: [],
   };
 
-  const watchedState = watcher(elements, i18n)(state);
-
-  const updatePosts = (delay) => {
-    const { feeds, posts } = state;
-    feeds.forEach((feed) => {
-      const url = getProxiedUrl(feed.link);
-      axios.get(url)
-        .then((response) => {
-          console.log(response)
-          const data = parser(response.data.contents);
-          const currentPosts = data.posts.map((post) => ({ ...post, id: feed.id }));
-          const oldPosts = posts.filter((post) => post.id === feed.id);
-          const newPosts = _.differenceWith(currentPosts, oldPosts, _.isEqual);
-          if (newPosts.length !== 0) {
-            newPosts.forEach((post) => watchedState.posts.push(post));
-          }
-        })
-        .catch(() => {
-          watchedState.form.error = i18n.t('errors.networkError');
-        })
-        .finally((e) => {
-          console.log(e)
-          setTimeout(updatePosts, delay);
-        });
-    });
-  };
+  const watchedState = watcher(elements, i18n, state);
 
   const delay = 5000;
-  updatePosts(delay);
+
+  const updatePosts = () => {
+    const { feeds, posts } = state;
+    const promis = feeds.map((feed) => {
+      const url = getProxiedUrl(feed.link);
+      const getNewPosts = axios.get(url).then((response) => {
+        const data = parser(response.data.contents);
+        const currentPosts = data.posts.map((post) => ({ ...post, id: feed.id }));
+        const oldPosts = posts.filter((post) => post.id === feed.id);
+        const newPosts = _.differenceWith(currentPosts, oldPosts, _.isEqual);
+        return newPosts;
+      });
+      return getNewPosts;
+    });
+
+    Promise.all(promis).then((newPosts) => {
+      if (newPosts[0] && newPosts[0].length > 0) {
+        newPosts[0].forEach((post) => watchedState.posts.push(post));
+      }
+    })
+      .catch((err) => {
+        watchedState.form.process = 'failed';
+        watchedState.form.process = null;
+        watchedState.form.errors = err.name;
+        watchedState.form.errors = null;
+      })
+      .finally(() => {
+        setTimeout(updatePosts, delay);
+      });
+  };
 
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
-    watchedState.form.process = i18n.t('loading');
+    watchedState.form.process = 'loading';
+    watchedState.form.process = null;
     const form = new FormData(e.target);
     const url = form.get('url');
     validate(url, watchedState.links)
@@ -107,19 +110,25 @@ export default () => {
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
             watchedState.links.push(validUrl);
-            watchedState.form.process = i18n.t('success');
+            watchedState.form.process = 'success';
+            watchedState.form.process = null;
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
             posts.forEach((post) => watchedState.posts.push({ ...post, id }));
-            watchedState.form.errors = null;
           })
           .catch((err) => {
-            const axiosError = err.message === 'Network Error' ? i18n.t('errors.networkError') : i18n.t('errors.rssError');
-            watchedState.form.errors = axiosError;
+            watchedState.form.process = 'failed';
+            watchedState.form.process = null;
+            watchedState.form.errors = err.name;
+            watchedState.form.errors = null;
           });
       })
       .catch((err) => {
-        watchedState.form.errors = i18n.t(err.errors);
+        watchedState.form.process = 'failed';
+        watchedState.form.process = null;
+        watchedState.form.errors = err.errors.join();
+        watchedState.form.errors = null;
       });
   });
+  updatePosts();
 };

@@ -80,14 +80,27 @@ const renderPosts = (elements, i18n, value) => {
   elements.posts.append(header, postsList);
 };
 
-const renderErrors = (elements, value) => {
+const renderErrorss = (elements, i18n, value) => {
   const el = elements;
-  if (value === null) return;
-  el.input.classList.add('is-invalid');
-  el.feedback.classList.replace('text-success', 'text-danger');
-  el.feedback.textContent = '';
-  el.feedback.textContent = value;
-  el.button.disabled = false;
+  switch (value) {
+    case null:
+      break;
+    case 'errors.urlError':
+      el.feedback.textContent = i18n.t(value);
+      break;
+    case 'errors.alreadyExist':
+      el.feedback.textContent = i18n.t(value);
+      break;
+    case 'AxiosError':
+      el.feedback.textContent = i18n.t('errors.networkError');
+      break;
+    case 'Error':
+      el.feedback.textContent = i18n.t('errors.rssError');
+      break;
+    default:
+      el.feedback.textContent = i18n.t('errors.somethingWrong');
+      break;
+  }
 };
 
 const handleProcessSubmit = (elements) => {
@@ -97,50 +110,61 @@ const handleProcessSubmit = (elements) => {
   el.button.disabled = false;
 };
 
-const renderStatus = (elements, value) => {
+const renderStatus = (elements, i18n, value) => {
   const el = elements;
   switch (value) {
-    case 'Идет загрузка':
+    case null:
+      break;
+    case 'loading':
       el.button.disabled = true;
-      el.feedback.textContent = '';
-      el.feedback.classList.replace('text-danger', 'text-success');
-      el.feedback.textContent = value;
+      el.feedback.classList.remove('text-danger');
+      el.feedback.classList.remove('text-success');
+      el.feedback.classList.add('text-secondary');
+      el.feedback.textContent = i18n.t(value);
       break;
-    case 'RSS успешно загружен':
-      el.feedback.textContent = '';
+    case 'success':
       el.input.classList.remove('is-invalid');
-      el.feedback.classList.replace('text-danger', 'text-success');
-      el.feedback.textContent = value;
+      el.feedback.classList.replace('text-secondary', 'text-success');
+      el.feedback.textContent = i18n.t(value);
       break;
-
+    case 'failed':
+      el.input.classList.add('is-invalid');
+      el.feedback.classList.remove('text-success');
+      el.feedback.classList.remove('text-secondary');
+      el.feedback.classList.add('text-danger');
+      el.button.disabled = false;
+      break;
     default:
       break;
   }
 };
 
-export default (elements, i18n) => (state) => onChange(state, (path, value) => {
-  switch (path) {
-    case 'form.process':
-      renderStatus(elements, value);
-      break;
+export default (elements, i18n, state) => {
+  const processFormHandler = onChange(state, (path, value) => {
+    switch (path) {
+      case 'form.process':
+        renderStatus(elements, i18n, value);
+        break;
 
-    case 'links':
-      handleProcessSubmit(elements);
-      break;
+      case 'links':
+        handleProcessSubmit(elements);
+        break;
 
-    case 'form.errors':
-      renderErrors(elements, value);
-      break;
+      case 'form.errors':
+        renderErrorss(elements, i18n, value);
+        break;
 
-    case 'feeds':
-      renderFeeds(elements, i18n, value);
-      break;
+      case 'feeds':
+        renderFeeds(elements, i18n, value);
+        break;
 
-    case 'posts':
-      renderPosts(elements, i18n, value);
-      break;
+      case 'posts':
+        renderPosts(elements, i18n, value);
+        break;
 
-    default:
-      break;
-  }
-});
+      default:
+        break;
+    }
+  });
+  return processFormHandler;
+};

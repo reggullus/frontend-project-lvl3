@@ -23,7 +23,7 @@ export default (rss) => {
   const parserError = doc.querySelector('parsererror');
 
   if (parserError) {
-    throw new Error(parserError.textContent);
+    throw new Error(parserError);
   }
 
   const feed = getFeed(doc);
