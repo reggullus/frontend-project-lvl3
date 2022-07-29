@@ -81,7 +81,6 @@ export default () => {
       });
       return getNewPosts;
     });
-
     Promise.all(promis).then((newPosts) => {
       if (newPosts[0] && newPosts[0].length > 0) {
         newPosts[0].forEach((post) => watchedState.posts.push(post));
