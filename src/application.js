@@ -70,22 +70,20 @@ export default () => {
 
   const updatePosts = () => {
     const { feeds, posts } = state;
-    const promis = feeds.map((feed) => {
+    const promise = feeds.map((feed) => {
       const url = getProxiedUrl(feed.link);
       const getNewPosts = axios.get(url).then((response) => {
         const data = parser(response.data.contents);
         const currentPosts = data.posts.map((post) => ({ ...post, id: feed.id }));
         const oldPosts = posts.filter((post) => post.id === feed.id);
         const newPosts = _.differenceWith(currentPosts, oldPosts, _.isEqual);
-        return newPosts;
+        if (newPosts.length > 0) {
+          newPosts.forEach((post) => watchedState.posts.push(post));
+        }
       });
       return getNewPosts;
     });
-    Promise.all(promis).then((newPosts) => {
-      if (newPosts[0] && newPosts[0].length > 0) {
-        newPosts[0].forEach((post) => watchedState.posts.push(post));
-      }
-    })
+    Promise.all(promise)
       .catch((err) => {
         watchedState.form.process = 'failed';
         watchedState.form.process = null;
