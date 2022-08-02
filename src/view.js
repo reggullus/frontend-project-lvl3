@@ -26,7 +26,23 @@ const renderFeeds = (elements, i18n, value) => {
   el.feeds.append(header, feedList);
 };
 
-const renderPosts = (elements, i18n, value) => {
+const renderModalWindow = (elements, value) => {
+  const el = elements;
+  const titles = elements.posts.querySelectorAll('a');
+  const currentPost = value.shift();
+  titles.forEach((title) => {
+    if (title.href !== currentPost.link) {
+      return;
+    }
+    title.classList.remove('fw-bold');
+    title.classList.add('fw-normal');
+    el.title.textContent = currentPost.title;
+    el.body.textContent = currentPost.description;
+    el.redirect.href = currentPost.link;
+  });
+};
+
+const renderPosts = (elements, i18n, value, state) => {
   const el = elements;
   const header = document.createElement('h2');
   header.textContent = i18n.t('posts');
@@ -45,7 +61,8 @@ const renderPosts = (elements, i18n, value) => {
 
     const titleEl = document.createElement('a');
     titleEl.textContent = title;
-    titleEl.classList.add('fw-bold');
+    const textClass = state.readingPosts.includes(item) ? 'fw-normal' : 'fw-bold';
+    titleEl.classList.add(textClass);
     titleEl.setAttribute('href', link);
     titleEl.setAttribute('target', '_blank');
     titleEl.setAttribute('rel', 'noopener noreferrer');
@@ -58,21 +75,8 @@ const renderPosts = (elements, i18n, value) => {
     watchButton.dataset.bsToggle = 'modal';
     watchButton.dataset.bsTarget = '#modal';
 
-    titleEl.addEventListener('click', () => {
-      titleEl.classList.remove('fw-bold');
-      titleEl.classList.add('fw-normal');
-    });
-
-    watchButton.addEventListener('click', () => {
-      titleEl.classList.remove('fw-bold');
-      titleEl.classList.add('fw-normal');
-      el.title.textContent = item.title;
-      el.body.textContent = item.description;
-      el.redirect.href = item.link;
-    });
-
     post.append(titleEl, watchButton);
-    fragment.append(post);
+    fragment.prepend(post);
   });
 
   el.posts.innerHTML = '';
@@ -159,7 +163,11 @@ export default (elements, i18n, state) => {
         break;
 
       case 'posts':
-        renderPosts(elements, i18n, value);
+        renderPosts(elements, i18n, value, state);
+        break;
+
+      case 'currentPosts':
+        renderModalWindow(elements, value);
         break;
 
       default:
