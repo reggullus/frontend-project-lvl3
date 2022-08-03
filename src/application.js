@@ -63,7 +63,7 @@ export default () => {
     links: [],
     feeds: [],
     posts: [],
-    currentPosts: [],
+    currentPosts: null,
     alreadyReadPosts: [],
   };
 
