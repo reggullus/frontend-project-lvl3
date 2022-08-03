@@ -26,10 +26,9 @@ const renderFeeds = (elements, i18n, value) => {
   el.feeds.append(header, feedList);
 };
 
-const renderModalWindow = (elements, value) => {
+const renderModalWindow = (elements, currentPost) => {
   const el = elements;
   const titles = elements.posts.querySelectorAll('a');
-  const currentPost = value.shift();
   titles.forEach((title) => {
     if (title.href !== currentPost.link) {
       return;
@@ -61,7 +60,7 @@ const renderPosts = (elements, i18n, value, state) => {
 
     const titleEl = document.createElement('a');
     titleEl.textContent = title;
-    const textClass = state.readingPosts.includes(item) ? 'fw-normal' : 'fw-bold';
+    const textClass = state.alreadyReadPosts.includes(item) ? 'fw-normal' : 'fw-bold';
     titleEl.classList.add(textClass);
     titleEl.setAttribute('href', link);
     titleEl.setAttribute('target', '_blank');

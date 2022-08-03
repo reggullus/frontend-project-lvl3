@@ -64,7 +64,7 @@ export default () => {
     feeds: [],
     posts: [],
     currentPosts: [],
-    readingPosts: [],
+    alreadyReadPosts: [],
   };
 
   const watchedState = watcher(elements, i18n, state);
@@ -118,9 +118,9 @@ export default () => {
             listEl.forEach((el) => el.addEventListener('click', () => {
               const title = el.querySelector('a');
               const currentPost = state.posts.find((item) => item.link === title.href);
-              watchedState.currentPosts.push(currentPost);
-              if (!state.readingPosts.includes(currentPost)) {
-                state.readingPosts.push(currentPost);
+              watchedState.currentPosts = currentPost;
+              if (!state.alreadyReadPosts.includes(currentPost)) {
+                state.alreadyReadPosts.push(currentPost);
               }
             }));
           })
