@@ -4,8 +4,8 @@ const getPosts = (data) => {
     const title = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
     const link = item.querySelector('link').textContent;
-    const post = { title, description, link };
-    return post;
+
+    return { title, description, link };
   });
   return posts;
 };
@@ -13,8 +13,8 @@ const getPosts = (data) => {
 const getFeed = (data) => {
   const title = data.querySelector('channel > title').textContent;
   const description = data.querySelector('channel > description').textContent;
-  const feed = { title, description };
-  return feed;
+
+  return { title, description };
 };
 
 export default (rss) => {
@@ -28,5 +28,6 @@ export default (rss) => {
 
   const feed = getFeed(doc);
   const posts = getPosts(doc);
+
   return { feed, posts };
 };

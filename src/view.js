@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 
 const renderFeeds = (elements, i18n, value) => {
-  const el = elements;
+  const { feeds } = elements;
   const header = document.createElement('h2');
   header.textContent = i18n.t('feeds');
 
@@ -22,27 +22,29 @@ const renderFeeds = (elements, i18n, value) => {
     feedList.prepend(feed);
   });
 
-  el.feeds.innerHTML = '';
-  el.feeds.append(header, feedList);
+  feeds.innerHTML = '';
+  feeds.append(header, feedList);
 };
 
 const renderModalWindow = (elements, currentPost) => {
-  const el = elements;
+  const { modalTitle, body, redirect } = elements;
   const titles = elements.posts.querySelectorAll('a');
+
   titles.forEach((title) => {
     if (title.href !== currentPost.link) {
       return;
     }
+
     title.classList.remove('fw-bold');
     title.classList.add('fw-normal');
-    el.title.textContent = currentPost.title;
-    el.body.textContent = currentPost.description;
-    el.redirect.href = currentPost.link;
+    modalTitle.textContent = currentPost.title;
+    body.textContent = currentPost.description;
+    redirect.href = currentPost.link;
   });
 };
 
 const renderPosts = (elements, i18n, value, state) => {
-  const el = elements;
+  const { posts } = elements;
   const header = document.createElement('h2');
   header.textContent = i18n.t('posts');
 
@@ -62,6 +64,7 @@ const renderPosts = (elements, i18n, value, state) => {
     titleEl.textContent = title;
     const textClass = state.alreadyReadPosts.includes(item) ? 'fw-normal' : 'fw-bold';
     titleEl.classList.add(textClass);
+
     titleEl.setAttribute('href', link);
     titleEl.setAttribute('target', '_blank');
     titleEl.setAttribute('rel', 'noopener noreferrer');
@@ -70,6 +73,7 @@ const renderPosts = (elements, i18n, value, state) => {
     watchButton.textContent = i18n.t('inspect');
     watchButton.classList.add('btn', 'btn-primary', 'btn-sm');
     watchButton.setAttribute('type', 'button');
+
     watchButton.dataset.id = id;
     watchButton.dataset.bsToggle = 'modal';
     watchButton.dataset.bsTarget = '#modal';
@@ -78,65 +82,76 @@ const renderPosts = (elements, i18n, value, state) => {
     fragment.prepend(post);
   });
 
-  el.posts.innerHTML = '';
+  posts.innerHTML = '';
   postsList.append(fragment);
-  elements.posts.append(header, postsList);
+  posts.append(header, postsList);
 };
 
 const renderErrorss = (elements, i18n, value) => {
-  const el = elements;
+  if (!value) {
+    return;
+  }
+  const { feedback } = elements;
+
   switch (value) {
-    case null:
-      break;
     case 'errors.urlError':
-      el.feedback.textContent = i18n.t(value);
+      feedback.textContent = i18n.t(value);
       break;
+
     case 'errors.alreadyExist':
-      el.feedback.textContent = i18n.t(value);
+      feedback.textContent = i18n.t(value);
       break;
+
     case 'AxiosError':
-      el.feedback.textContent = i18n.t('errors.networkError');
+      feedback.textContent = i18n.t('errors.networkError');
       break;
     case 'Error':
-      el.feedback.textContent = i18n.t('errors.rssError');
+
+      feedback.textContent = i18n.t('errors.rssError');
       break;
+
     default:
-      el.feedback.textContent = i18n.t('errors.somethingWrong');
+      feedback.textContent = i18n.t('errors.somethingWrong');
       break;
   }
 };
 
 const handleProcessSubmit = (elements) => {
-  const el = elements;
-  el.form.reset();
-  el.input.focus();
-  el.button.disabled = false;
+  const { form, input, button } = elements;
+  form.reset();
+  input.focus();
+  button.disabled = false;
 };
 
 const renderStatus = (elements, i18n, value) => {
-  const el = elements;
+  const { input, feedback, button } = elements;
+
   switch (value) {
     case null:
       break;
+
     case 'loading':
-      el.button.disabled = true;
-      el.feedback.classList.remove('text-danger');
-      el.feedback.classList.remove('text-success');
-      el.feedback.classList.add('text-secondary');
-      el.feedback.textContent = i18n.t(value);
+      button.disabled = true;
+      feedback.classList.remove('text-danger');
+      feedback.classList.remove('text-success');
+      feedback.classList.add('text-secondary');
+      feedback.textContent = i18n.t(value);
       break;
+
     case 'success':
-      el.input.classList.remove('is-invalid');
-      el.feedback.classList.replace('text-secondary', 'text-success');
-      el.feedback.textContent = i18n.t(value);
+      input.classList.remove('is-invalid');
+      feedback.classList.replace('text-secondary', 'text-success');
+      feedback.textContent = i18n.t(value);
       break;
+
     case 'failed':
-      el.input.classList.add('is-invalid');
-      el.feedback.classList.remove('text-success');
-      el.feedback.classList.remove('text-secondary');
-      el.feedback.classList.add('text-danger');
-      el.button.disabled = false;
+      input.classList.add('is-invalid');
+      feedback.classList.remove('text-success');
+      feedback.classList.remove('text-secondary');
+      feedback.classList.add('text-danger');
+      button.disabled = false;
       break;
+
     default:
       break;
   }

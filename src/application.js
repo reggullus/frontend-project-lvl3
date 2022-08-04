@@ -41,6 +41,7 @@ export default () => {
       },
     });
   });
+
   const elements = {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
@@ -49,21 +50,20 @@ export default () => {
     feeds: document.querySelector('.feeds'),
     posts: document.querySelector('.posts'),
     modalFade: document.querySelector('#modal'),
-    title: document.querySelector('#modal .modal-title'),
+    modalTitle: document.querySelector('#modal .modal-title'),
     body: document.querySelector('#modal .modal-body'),
     redirect: document.querySelector('#modal a'),
   };
 
   const state = {
     form: {
-      process: null,
-      errors: null,
-      axiosError: null,
+      process: '',
+      errors: '',
     },
     links: [],
     feeds: [],
     posts: [],
-    currentPosts: null,
+    currentPosts: {},
     alreadyReadPosts: [],
   };
 
@@ -71,8 +71,10 @@ export default () => {
 
   const updatePosts = () => {
     const { feeds, posts } = state;
+
     const promise = feeds.map((feed) => {
       const url = getProxiedUrl(feed.link);
+
       const getNewPosts = axios.get(url).then((response) => {
         const data = parser(response.data.contents);
         const currentPosts = data.posts.map((post) => ({ ...post, id: feed.id }));
@@ -87,6 +89,7 @@ export default () => {
       });
       return getNewPosts;
     });
+
     Promise.all(promise)
       .catch((err) => {
         watchedState.form.process = 'failed';
@@ -101,28 +104,23 @@ export default () => {
     e.preventDefault();
     watchedState.form.process = 'loading';
     watchedState.form.errors = null;
+
     const form = new FormData(e.target);
     const url = form.get('url');
+
     validate(url, watchedState.links)
       .then((validUrl) => {
         axios.get(getProxiedUrl(validUrl))
           .then((response) => {
             const { feed, posts } = parser(response.data.contents);
+
             watchedState.links.push(validUrl);
             watchedState.form.process = 'success';
+
             const id = _.uniqueId();
             watchedState.feeds.push({ ...feed, id, link: validUrl });
-            posts.forEach((post) => watchedState.posts.push({ ...post, id }));
 
-            const listEl = elements.posts.querySelectorAll('li');
-            listEl.forEach((el) => el.addEventListener('click', () => {
-              const title = el.querySelector('a');
-              const currentPost = state.posts.find((item) => item.link === title.href);
-              watchedState.currentPosts = currentPost;
-              if (!state.alreadyReadPosts.includes(currentPost)) {
-                state.alreadyReadPosts.push(currentPost);
-              }
-            }));
+            posts.forEach((post) => watchedState.posts.push({ ...post, id }));
           })
           .catch((err) => {
             watchedState.form.process = 'failed';
@@ -134,5 +132,16 @@ export default () => {
         watchedState.form.errors = err.errors.join();
       });
   });
+
+  elements.posts.addEventListener('click', (e) => {
+    const currentLink = e.target.href ?? e.target.previousElementSibling.href;
+    const currentPost = state.posts.find((item) => item.link === currentLink);
+    watchedState.currentPosts = currentPost;
+
+    if (!state.alreadyReadPosts.includes(currentPost)) {
+      state.alreadyReadPosts.push(currentPost);
+    }
+  });
+
   updatePosts();
 };
