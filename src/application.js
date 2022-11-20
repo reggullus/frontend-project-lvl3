@@ -92,8 +92,7 @@ export default () => {
 
     Promise.all(promise)
       .catch((err) => {
-        watchedState.form.process = 'failed';
-        watchedState.form.errors = err.name;
+        console.error(err);
       })
       .finally(() => {
         setTimeout(updatePosts, delay);
